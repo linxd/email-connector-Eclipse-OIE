@@ -126,6 +126,8 @@ Requirements: a JDK 11+ (the runtime bundled with the engine, `<OIE_HOME>/jre`, 
 
 ## Design notes (for developers)
 
+The [development guide](docs/development.md) covers building, a poll step by step, POP3 and IMAP, the mail libraries, the settings panels, testing and releasing in detail. In short:
+
 - **Package name.** The settings class must live under `com.mirth.connect.connectors.*`. The engine's XStream security allow-list only accepts that family of packages, and a class outside it makes the Swing client fail to read any channel that uses the connector (and freeze while reporting it). That is why this connector does not use a `com.matthy...` package.
 - **Folder name = `path`.** The `path` attribute in `source.xml` (`email-reader`) must equal the extension folder name; the client download servlet and the web-admin loader both build URLs from it.
 - **Web administrator.** `webadmin/web/plugin.js` registers the panel with `platform.registerConnectorPanel("Email Reader", "SOURCE", ...)`. Engine-hosted web plugins are loaded as a single module, so it imports only the bare `@oie/web-ui` specifier and reads `platform.React` at render time.
