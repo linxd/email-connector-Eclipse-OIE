@@ -1,7 +1,7 @@
-// Email Reader source connector (POP3 and IMAP) - settings panel for the web administrator.
-// Engine-hosted plugins are loaded as a single blob module, so only bare @oie/*
-// imports (resolved through the page's import map) are available. The form
-// building blocks come from @oie/web-ui; React comes from the platform object.
+// 邮件读取器源连接器（POP3 和 IMAP）- Web 管理器设置面板。
+// 引擎托管的插件作为单个 blob 模块加载，因此仅有裸 @oie/*
+// 导入（通过页面的 import map 解析）可用。表单
+// 构建块来自 @oie/web-ui；React 来自平台对象。
 import {
   ConnectorForm,
   PollSection,
@@ -13,11 +13,11 @@ import {
 } from "@oie/web-ui";
 
 const PROPERTIES_CLASS = "com.mirth.connect.connectors.email.shared.EmailReceiverProperties";
-const CONNECTOR_NAME = "Email Reader";
+const CONNECTOR_NAME = "邮件读取器";
 
 const isImap = (p) => p.mailProtocol === "IMAP";
 
-// 995/110 (POP3) and 993/143 (IMAP) follow the protocol and SSL choice; a custom port is left alone.
+// 995/110 (POP3) 和 993/143 (IMAP) 根据协议和 SSL 选择而定；自定义端口保持不变。
 const DEFAULT_PORTS = { POP3: { true: "995", false: "110" }, IMAP: { true: "993", false: "143" } };
 const isDefaultPort = (port) => ["110", "143", "993", "995"].includes(String(port ?? "").trim());
 function syncPort(properties) {
@@ -33,7 +33,7 @@ export function createEmailReader(platform) {
         "@class": PROPERTIES_CLASS,
         "@version": version,
         pluginProperties: null,
-        // The engine default of 5 seconds is far too eager for a mailbox.
+        // 引擎默认的 5 秒对邮箱来说太频繁了。
         pollConnectorProperties: { ...defaultPollProperties(version), pollingFrequency: 60000 },
         sourceConnectorProperties: defaultSourceProperties(version),
         mailProtocol: "POP3",
@@ -50,7 +50,7 @@ export function createEmailReader(platform) {
     },
 
     component({ properties, onChange }) {
-      // platform.React is set by the shell at boot, so read it at render time.
+      // platform.React 由外壳在启动时设置，因此在渲染时读取。
       const React = platform.React;
       return React.createElement(
         "div",
@@ -60,63 +60,63 @@ export function createEmailReader(platform) {
           properties,
           onChange,
           fields: [
-            { section: "Mail Server Settings" },
+            { section: "邮件服务器设置" },
             {
               key: "mailProtocol",
-              label: "Protocol",
+              label: "协议",
               type: "select",
               width: "110px",
               options: ["POP3", "IMAP"],
               refresh: true,
               onSet: syncPort,
-              tooltip: "POP3 downloads what is in the mailbox. IMAP can read one folder and keep track of read mails."
+              tooltip: "POP3 下载邮箱中的所有邮件。IMAP 可以读取单个文件夹并跟踪已读邮件。"
             },
-            { key: "host", label: "Host", type: "text", width: "220px", tooltip: "Host name of the mail server, e.g. pop.provider.com or imap.provider.com" },
-            { key: "port", label: "Port", type: "number", width: "90px", tooltip: "POP3: 995 (SSL) or 110. IMAP: 993 (SSL) or 143." },
-            { key: "useSsl", label: "Use SSL", type: "radio", options: YES_NO, onSet: syncPort, tooltip: "POP3S / IMAPS (encrypted connection)" },
-            { key: "username", label: "Username", type: "text", width: "220px" },
-            { key: "password", label: "Password", type: "password", width: "220px" },
-            { key: "folder", label: "Folder", type: "text", width: "220px", visible: isImap, tooltip: "IMAP folder to read, e.g. INBOX" },
+            { key: "host", label: "主机", type: "text", width: "220px", tooltip: "邮件服务器的主机名，例如 pop.provider.com 或 imap.provider.com" },
+            { key: "port", label: "端口", type: "number", width: "90px", tooltip: "POP3：995 (SSL) 或 110。IMAP：993 (SSL) 或 143。" },
+            { key: "useSsl", label: "使用 SSL", type: "radio", options: YES_NO, onSet: syncPort, tooltip: "POP3S / IMAPS（加密连接）" },
+            { key: "username", label: "用户名", type: "text", width: "220px" },
+            { key: "password", label: "密码", type: "password", width: "220px" },
+            { key: "folder", label: "文件夹", type: "text", width: "220px", visible: isImap, tooltip: "要读取的 IMAP 文件夹，例如 INBOX" },
             {
               key: "unreadOnly",
-              label: "Only Unread",
+              label: "仅未读",
               type: "radio",
               options: YES_NO,
               visible: isImap,
-              tooltip: "Fetch only mails that are not marked as read. With No, every poll dispatches every mail in the folder again (unless they are deleted)."
+              tooltip: "仅获取未标记为已读的邮件。选择"否"时，每次轮询都会重新发送文件夹中的每封邮件（除非已被删除）。"
             },
             {
               key: "markAsRead",
-              label: "Mark as Read",
+              label: "标记为已读",
               type: "radio",
               options: YES_NO,
               visible: (p) => isImap(p) && !asBool(p.deleteAfterFetch),
-              tooltip: "Mark a mail as read once it was handed to the channel. Together with Only Unread this makes sure every mail is fetched once."
+              tooltip: "邮件传递给通道后标记为已读。与"仅未读"配合使用，确保每封邮件只被获取一次。"
             },
             {
               key: "deleteAfterFetch",
-              label: "Delete After Fetch",
+              label: "获取后删除",
               type: "radio",
               options: YES_NO,
               refresh: true,
-              tooltip: "Delete a mail from the server once it was handed to the channel. POP3: with No, every poll dispatches every mail in the mailbox again."
+              tooltip: "邮件传递给通道后从服务器删除。POP3：选择"否"时，每次轮询都会重新发送邮箱中的每封邮件。"
             }
           ]
         })
       );
     },
 
-    // Mirrors the Swing panel (EmailReader.checkProperties).
+    // 对应 Swing 面板 (EmailReader.checkProperties)。
     validate(properties) {
       const errors = requireFields(properties, [
-        { key: "host", label: "Host" },
-        { key: "port", label: "Port" },
-        { key: "username", label: "Username" },
-        { key: "folder", label: "Folder", when: isImap }
+        { key: "host", label: "主机" },
+        { key: "port", label: "端口" },
+        { key: "username", label: "用户名" },
+        { key: "folder", label: "文件夹", when: isImap }
       ]);
       const port = Number(String(properties.port ?? "").trim());
       if (!errors.some((e) => e.key === "port") && !(Number.isInteger(port) && port >= 1 && port <= 65535)) {
-        errors.push({ key: "port", label: "Port (1-65535)" });
+        errors.push({ key: "port", label: "端口 (1-65535)" });
       }
       return errors;
     }

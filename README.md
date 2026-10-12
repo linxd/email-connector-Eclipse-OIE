@@ -1,16 +1,16 @@
-# Email Reader for Eclipse OIE
+# Eclipse OIE 邮件读取器
 
-A **source connector type** for [Eclipse Open Integration Engine](https://openintegrationengine.org/) (tested on **4.6.0**) that polls a **POP3 or IMAP** mailbox and hands every mail to the channel as a small plain-text XML document. Choose "Email Reader" as the Source of a channel in the Swing client or the web administrator and pick the protocol (POP3 or IMAP) in its settings.
+A **source connector type** (源连接器类型) for [Eclipse Open Integration Engine](https://openintegrationengine.org/) (tested on **4.6.0**) that polls a **POP3 or IMAP** mailbox and hands every mail to the channel as a small plain-text XML document. Choose "Email Reader" as the Source of a channel in the Swing client or the web administrator and pick the protocol (POP3 or IMAP) in its settings.
 
-> Community extension. It is not part of, or endorsed by, the Eclipse OIE project.
+> 社区扩展。它不是 Eclipse OIE 项目的一部分，也未获其认可。
 
-The extension lives in [`connector/`](connector).
+此扩展位于 [`connector/`](connector).
 
-## What you get
+## 功能概览
 
 - "Email Reader" in the Source connector type list of the **Swing client** and the **web administrator**.
-- Settings per channel: protocol (POP3 or IMAP), host, port, SSL, username, password, *Delete after fetch* and, for IMAP, the folder plus *Only unread* and *Mark as read*, plus the engine's standard polling settings (interval, schedule, source queue, response, ...). The default polling interval is **60 seconds**.
-- Every mail is dispatched into the channel as one raw message:
+- Settings per channel: protocol (POP3 or IMAP), host, port, SSL, username, password, *Delete after fetch* and, for IMAP, the folder plus *Only unread* and *Mark as read*, plus the engine's standard polling settings (interval, schedule, source queue, response, ...). 默认轮询间隔为 **60 seconds**.
+- 每封邮件作为一条原始消息传递到通道：
 
 ```xml
 <email>
@@ -22,11 +22,11 @@ The extension lives in [`connector/`](connector).
 </email>
 ```
 
-The body is plain text only: in a `multipart/alternative` mail the `text/plain` part wins, HTML is converted to text only when there is no plain-text part, attachments and other non-text parts are skipped, illegal XML characters are removed. Set the channel's **inbound data type** to XML (or Raw) to parse it in a transformer.
+正文仅为纯文本： in a `multipart/alternative` mail the `text/plain` part wins, HTML is converted to text only when there is no plain-text part, attachments and other non-text parts are skipped, illegal XML characters are removed. 设置通道的's **inbound data type（入站数据类型）** to XML (or Raw) 以在转换器中解析。
 
-### Source map
+### 源映射
 
-The mail details are also put in the **source map** of every message, so filters and destinations can use them without parsing the XML. They are visible in the message browser under *Mappings* → *Source Map*.
+邮件详情也会放入每条消息的 **源映射** 中, 以便过滤器和目标可以不解析 XML 即可使用。 它们在消息浏览器中的 *Mappings* → *Source Map*.
 
 | Variable | Contents | Example |
 |---|---|---|
@@ -38,15 +38,15 @@ The mail details are also put in the **source map** of every message, so filters
 | `mailbox` | the mailbox that was polled (`username@host`) | `intake@imap.example.org` |
 | `folder` | *IMAP only.* the folder that was polled | `INBOX` |
 
-A value the mail does not have (no subject, no date) is an empty string, so a filter does not need a null check:
+邮件中不存在的值（无主题、无日期）为空字符串，因此过滤器无需进行空值检查：
 
 ```javascript
 return $('from').indexOf('@lab.example.org') > -1;
 ```
 
-The `<sentDate>` in the XML keeps its old format, so existing transformers keep working.
+The `<sentDate>` in the XML 保持原有格式，因此现有转换器继续工作。
 
-## Install
+## 安装
 
 0. Or install it from the [OIE Community Store](https://github.com/gibson9583/oie-community-store), where it is listed as **Email Reader**.
 1. Download `email-reader-connector-<version>.zip` from the [Releases](../../releases) page (or build it, see below).
@@ -58,7 +58,7 @@ When upgrading within 3.x, install the new zip over the old one and restart. If 
 
 **Upgrading from 2.x:** the connector was called "POP3 Reader" until 2.1.0 and is now "Email Reader" (new extension folder `email-reader`, new class names). Uninstall the old "POP3 Reader" extension first and restart the engine, install 3.0.0, and recreate the channels that used it: the settings of a channel are stored under the connector name and class, so they cannot be carried over.
 
-## Settings
+## 设置项
 
 | Setting | Meaning | Default |
 |---|---|---|
@@ -73,7 +73,7 @@ When upgrading within 3.x, install the new zip over the old one and restart. If 
 | Delete after fetch | delete a mail from the server once it was handed to the channel | **off** |
 | Polling | the engine's standard polling settings | every 60 s |
 
-## Important behavior
+## 重要行为说明
 
 - **POP3 has no memory of processed mail.** With *Delete after fetch* off, every poll dispatches every mail in the mailbox again. Test with a small test mailbox and switch it on once the channel works.
 - **IMAP remembers what it has read.** With the defaults (*Only unread* and *Mark as read* on) every mail is fetched exactly once and stays in the mailbox as a read mail. A mail is only marked as read after the channel accepted it; a mail that could not be dispatched stays unread and is tried again on the next poll. Reading a mail does not mark it as read by itself.
@@ -82,7 +82,7 @@ When upgrading within 3.x, install the new zip over the old one and restart. If 
 - One mailbox (and for IMAP one folder) per channel.
 - IMAP uses a plain connection or IMAPS. STARTTLS and OAuth2 logins are not supported.
 
-## Logging
+## 日志
 
 The default `log4j2.properties` uses `rootLogger = ERROR`, so normal messages are hidden. Errors of a poll are always shown in the dashboard's error log and `mirth.log`. To see more, add to `<OIE_HOME>/conf/log4j2.properties` and restart:
 
@@ -91,7 +91,7 @@ logger.emailc.name = com.mirth.connect.connectors.email
 logger.emailc.level = INFO
 ```
 
-## Build
+## 构建
 
 Requirements: a JDK 11+ (the runtime bundled with the engine, `<OIE_HOME>/jre`, includes `javac` and works as `JAVA_HOME`) and Maven 3.9+.
 
@@ -124,7 +124,7 @@ Requirements: a JDK 11+ (the runtime bundled with the engine, `<OIE_HOME>/jre`, 
    └── lib/                       (jakarta.mail, angus-mail and their activation libraries)
    ```
 
-## Design notes (for developers)
+## 设计说明（开发者）
 
 The [development guide](docs/development.md) covers building, a poll step by step, POP3 and IMAP, the mail libraries, the settings panels, testing and releasing in detail. In short:
 
@@ -133,6 +133,6 @@ The [development guide](docs/development.md) covers building, a poll step by ste
 - **Web administrator.** `webadmin/web/plugin.js` registers the panel with `platform.registerConnectorPanel("Email Reader", "SOURCE", ...)`. Engine-hosted web plugins are loaded as a single module, so it imports only the bare `@oie/web-ui` specifier and reads `platform.React` at render time.
 - Mail parts are read through streams instead of `getContent()`, to avoid the mailcap clash with the engine's older `jakarta.mail 1.6.7` / `javax.activation`.
 
-## License
+## 许可证
 
 [Mozilla Public License 2.0](LICENSE).

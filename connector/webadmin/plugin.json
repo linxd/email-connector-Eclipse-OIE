@@ -1,9 +1,9 @@
 {
     "id": "connector-emailreader",
-    "name": "Email Reader Connector",
+    "name": "邮件读取器连接器",
     "version": "3.1.1",
     "author": "X Connections",
-    "description": "Settings panel for the Email Reader source connector (web administrator equivalent of the Swing ConnectorSettingsPanel).",
+    "description": "邮件读取器源连接器的设置面板（Web 管理器中对应 Swing ConnectorSettingsPanel 的界面）。",
     "oie": { "apiMin": "4.6" },
     "client": { "entry": "web/plugin.js" }
 }
